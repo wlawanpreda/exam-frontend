@@ -14,12 +14,76 @@ body,
   display: flex;
   justify-content: center;
   align-items: center;
+  background-image: url("assets/images/bg.jpg");
 }
 
 .container {
   width: 90%;
   height: 90vh;
-  background-color: white;
+  background-color: #ffffff;
   border-radius: 20px;
   margin-top: 40px;
+  padding: 10px;
+}
+
+.title {
+  font-size: 37px;
+  color: #383838;
+}
+
+button {
+  font-size: 30px;
+  padding: 20px 40px;
+  border-radius: 10px;
+  border: none;
+  color: #ffffff;
+  background-image: radial-gradient(ellipse farthest-corner at top left, #c41417 0%, #b31315 100%);
+  
+}
+button.text { 
+  background-color: white;
+  background-image: none;
+  color: #6f6f6f;
+}
+button.text:hover { 
+  background-color: white;
+  background-image: none;
+  color: #6f6f6f;
+}
+
+input {
+  height: 60px;
+  color: #4e4e4e;
+  border: 3px solid lightgray;
+  border-radius: 10px;
+  font-size: 34px;
+}
+
+
+
+// by-pj
+.center {
+  text-align: center;
+}
+.chat-title {
+  margin: 0;
+  padding: 0;
+}
+.chat-blog {
+  border-radius: 10px;
+  padding: 10px;
+  background-color: #f1f1f1;
+  margin: 0;
+  padding: 0px 10px 10px;
+}
+.chat-blog .chat-from {
+  margin: 0;
+  font-weight: lighter;
+  font-size: 70%;
+}
+.chat-blog .chat-message {
+  background-color: #737375;
+  margin: 0px 20px;
+  padding: 0px 10px;
+  border-radius: 5px;
 }
