@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { modeState, roomState } from "../store/atoms";
 import { gql, useMutation } from '@apollo/client';
+import { toast } from "react-toastify";
 
 const CREATE_ROOM = gql`
   mutation CreateRoom($roomName: String!) {
@@ -26,6 +27,7 @@ const RoomForm = () => {
     }
     
     await createRoom({ variables: { roomName: input } });
+    if(!data) toast.info("Already Room!", { autoClose: 2000 });  
     setRoom(input);
   };
 

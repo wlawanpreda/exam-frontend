@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-
-import { useRecoilValue } from "recoil";
-import { nameState, roomState } from "../store/atoms";
-import { gql, useQuery, useMutation } from "@apollo/client";
+import React, { useState, useEffect } from "react";
+import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
+import { modeState, nameState, roomState } from "../store/atoms";
+import { gql, useQuery, useMutation, useSubscription } from "@apollo/client";
+import { toast } from "react-toastify";
 
 const GET_MESSAGE = gql`
   query Messages($roomName: String!) {
@@ -24,36 +24,70 @@ const SEND_MESSAGE = gql`
   }
 `;
 
+const COMMENTS_SUBSCRIPTION = gql`
+  subscription NewMessage($roomName: String!) {
+    newMessage(roomName: $roomName) {
+      id
+      body
+      from {
+        name
+      }
+    }
+  }
+`;
+
 const ChatRoom = () => {
   const [message, setMessage] = useState();
-  const name = useRecoilValue(nameState);
-  const roomName = useRecoilValue(roomState);
+  const [messageAfterQuery, setMessageAfterQuery] = useState([]);
 
-  const { loading, error, data, refetch } = useQuery(GET_MESSAGE, {
+  const setMode = useSetRecoilState(modeState);
+  const name = useRecoilValue(nameState);
+  const [roomName, setRoomName] = useRecoilState(roomState);
+
+  const { loading, error, data: dataQuery, refetch } = useQuery(GET_MESSAGE, {
     variables: { roomName },
   });
-  const [sendMessage, { data: dataSet }] = useMutation(SEND_MESSAGE);
+  const [sendMessage, { data: dataMutation }] = useMutation(SEND_MESSAGE);
+
+  const {
+    data: dataSubscription,
+    loading: subLoading,
+  } = useSubscription(COMMENTS_SUBSCRIPTION, { variables: { roomName } });
 
   const actionSendMessage = async (event) => {
     if (!message) {
-      alert("Please set Message!");
+      toast.error("Please set Message!", { autoClose: 2000 });
       return false;
     }
-
-    await sendMessage({ variables: { message, roomName, user: name } });
+    const variables = { message, roomName, user: name };
+    await sendMessage({ variables });
+    setMessage("");
     refetch();
   };
 
+  useEffect(() => {
+    if (dataSubscription && dataSubscription.newMessage.from.name !== name) {
+      console.log("PJ-LOG: dataSubscription", dataSubscription);
+      toast("New Message!", { autoClose: 2000 });
+      refetch();
+    }
+  }, [dataSubscription]);
+
   if (loading) return "loading...";
-  if (error) throw error;
+  if (error) {
+    toast.error("Cann't find Room!", { autoClose: 2000 });
+    setRoomName();
+    setMode("findRoom");
+    return `error: ${error}`;
+  }
 
   return (
-    <div>
+    <>
       <p className="title chat-title">ห้อง {roomName}</p>
       <div className="chat-blog">
-        {data.messages &&
-          data.messages.length > 0 &&
-          data.messages.map((msg, key) => {
+        {dataQuery.messages &&
+          dataQuery.messages.length > 0 &&
+          dataQuery.messages.map((msg, key) => {
             return (
               <span key={key}>
                 <p className="chat-from">คุณ {msg.from.name}</p>
@@ -62,16 +96,15 @@ const ChatRoom = () => {
             );
           })}
       </div>
-      <p>
-        <input
-          style={{ width: "100%" }}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyUp={(e) =>
-            e.key === "Enter" || e.keyCode === 13 ? actionSendMessage() : null
-          }
-        />
-      </p>
-    </div>
+      <input
+        style={{ width: "100%" }}
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyUp={(e) =>
+          e.key === "Enter" || e.keyCode === 13 ? actionSendMessage() : null
+        }
+      />
+    </>
   );
 };
 

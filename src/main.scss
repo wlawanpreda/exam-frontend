@@ -74,8 +74,12 @@ input {
   padding: 10px;
   background-color: #f1f1f1;
   margin: 0;
-  padding: 0px 10px 10px;
+  position: sticky;
+  height: calc(80%);
+  overflow-y: auto;
 }
+
+
 .chat-blog .chat-from {
   margin: 0;
   font-weight: lighter;
