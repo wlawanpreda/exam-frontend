@@ -38,7 +38,6 @@ const COMMENTS_SUBSCRIPTION = gql`
 
 const ChatRoom = () => {
   const [message, setMessage] = useState();
-  const [messageAfterQuery, setMessageAfterQuery] = useState([]);
 
   const setMode = useSetRecoilState(modeState);
   const name = useRecoilValue(nameState);

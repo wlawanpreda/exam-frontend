@@ -23,11 +23,13 @@ const RoomForm = () => {
 
     if(!input) {
       alert("Please set Room Name!")
+      toast.error("Please set Room Name!", { autoClose: 2000 });  
       return false
     }
     
     await createRoom({ variables: { roomName: input } });
-    if(!data) toast.info("Already Room!", { autoClose: 2000 });  
+    if(!data) toast.info("Set Room!", { autoClose: 2000 });  
+    console.log("PJ-LOG: submitHandler -> data", data)
     setRoom(input);
   };
 
